@@ -58,10 +58,11 @@ PrevHash: ...
 
 ### Difficulty
 
-In `blockchain.go`, you can change the mining difficulty:
+In `blockchain.go`, you can change the mining difficulty by shortening or adding the target prefix.
+For example, you can increase the difficulty by adding another zero in the prefix, "000"
 
 ```go
-const difficulty = 2 // Lower = faster mining
+const targetPrefix = "00" // Difficulty: hash must start with this
 ```
 
 ## 🧪 Extend This Project
