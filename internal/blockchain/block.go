@@ -4,31 +4,37 @@ import (
 	"bytes"
 	"crypto/sha256"
 	"encoding/gob"
+	"encoding/hex"
+	"fmt"
+	"strconv"
+	"time"
 )
 
+type Transaction struct {
+	Sender   string
+	Receiver string
+	Amount   float64
+}
+
 type Block struct {
-	Index     int
-	Timestamp int64
-	Data      string
-	PrevHash  []byte
-	Hash      []byte
-	Nonce     int
+	Timestamp    time.Time
+	Transactions []Transaction
+	PrevHash     string
+	Hash         string
+	Nonce        int
 }
 
 // CalculateHash returns the SHA 256 hash of the block contents.
-func (b *Block) CalculateHash() []byte {
-	data := bytes.Join(
-		[][]byte{
-			IntToHex(int64(b.Index)),
-			IntToHex(b.Timestamp),
-			[]byte(b.Data),
-			b.PrevHash,
-			IntToHex(int64(b.Nonce)),
-		}, []byte{},
-	)
-	hash := sha256.Sum256(data)
+func CalculateHash(block Block) string {
+	txData := ""
+	for _, tx := range block.Transactions {
+		txData += fmt.Sprintf("%s->%s:%.2f|", tx.Sender, tx.Receiver, tx.Amount)
+	}
+	record := block.Timestamp.String() + txData + block.PrevHash + strconv.Itoa(block.Nonce)
 
-	return hash[:]
+	hash := sha256.Sum256([]byte(record))
+
+	return hex.EncodeToString(hash[:])
 }
 
 // Serialize the block for storage/transmission
